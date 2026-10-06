@@ -1,0 +1,6 @@
+@WCNApi_HostAddress = http://localhost:5269
+
+GET {{WCNApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

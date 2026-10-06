@@ -1,0 +1,12 @@
+AppDbContext - > UserRepository : IUserRepository -> UserService : IUserService - > UserController : Controller -> 
+
+
+AppDbContext - This will connect with db and excute query and sp
+UserRepository - This will construct parameters and initali sp name and pass this into AppDbContext
+Domain.Models - This is used to keep results
+Application.ServiceResult - This is used to keep results in the following property  such as Data, Success, ErrorMessage and StatusCode
+							and it will have SuccessResult and ErrorResult property
+							
+							
+WCNDbContext - > UserRepository : IUserRepository -> UserService : IUserService - > UserController : Controller -> 
+WCNDbContext - > AuthRepository : IAuthepository -> AuthService : IAuthService - >AtuhController : Controller -> 
