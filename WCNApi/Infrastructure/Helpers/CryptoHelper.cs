@@ -8,6 +8,7 @@ namespace WCNApi.Infrastructure.Helpers
         public static string SecretKey { get; set; }
         public static string ResponseSecretKey { get; set; }
 
+        //For Encrypt entire response
         public static string EncryptData(string data, bool isURLData = true)
         {
             if (SecretKey.Length > 32)
@@ -113,14 +114,23 @@ namespace WCNApi.Infrastructure.Helpers
             }
         }
 
+        //public static string GenerateSecretKey(string value)
+        //{
+        //    var keyMaterial = $"{ResponseSecretKey}{value}";
+        //    using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(ResponseSecretKey)))
+        //    {
+        //        var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(keyMaterial));
+        //        return Convert.ToBase64String(hash);
+        //    }
+        //}
+
         public static string GenerateSecretKey(string value)
         {
-            var keyMaterial = $"{ResponseSecretKey}{value}";
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(ResponseSecretKey)))
-            {
-                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(keyMaterial));
-                return Convert.ToBase64String(hash);
-            }
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(ResponseSecretKey));
+
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(value));
+
+            return Convert.ToBase64String(hash);
         }
 
         public static string GenerateShortHash(string input)
@@ -146,6 +156,53 @@ namespace WCNApi.Infrastructure.Helpers
         {
             const string chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             return chars[b % 36];
+        }
+
+        private static byte[] GetKeyBytes(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                throw new InvalidOperationException(
+                    "Encryption key is not configured.");
+            }
+
+            string normalizedKey;
+
+            if (key.Length > 32)
+            {
+                normalizedKey = key.Substring(0, 32);
+            }
+            else if (key.Length < 32)
+            {
+                normalizedKey = key.PadRight(32, ' ');
+            }
+            else
+            {
+                normalizedKey = key;
+            }
+
+            return Encoding.UTF8.GetBytes(normalizedKey);
+        }
+
+        public static string DecryptResponse(string encryptedText, string key)
+        {
+            if (string.IsNullOrWhiteSpace(encryptedText))
+            {
+                return string.Empty;
+            }
+
+            byte[] keyBytes = GetKeyBytes(key);
+
+            using Aes aes = Aes.Create();
+
+            aes.Key = keyBytes;
+            aes.Mode = CipherMode.ECB;
+            aes.Padding = PaddingMode.PKCS7;
+
+            using ICryptoTransform decryptor = aes.CreateDecryptor();
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedText);
+            byte[] decryptedBytes = decryptor.TransformFinalBlock(encryptedBytes, 0, encryptedBytes.Length);
+            return Encoding.UTF8.GetString(decryptedBytes);
         }
     }
 }

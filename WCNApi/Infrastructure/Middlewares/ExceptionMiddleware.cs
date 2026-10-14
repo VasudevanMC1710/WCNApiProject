@@ -1,5 +1,5 @@
 ﻿
-using System.Net;
+using Microsoft.Data.SqlClient;
 using WCNApi.Infrastructure.Errors;
 
 namespace WCNApi.Infrastructure.Middlewares
@@ -31,10 +31,29 @@ namespace WCNApi.Infrastructure.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             string controllerName = Convert.ToString(context.GetRouteData().Values["controller"]);
-            ErrorCode errorCode = string.IsNullOrEmpty(controllerName) ? ErrorCode.NoError : (ErrorCode)Enum.Parse(typeof(ErrorCode), controllerName);
+            //ErrorCode errorCode = string.IsNullOrEmpty(controllerName) ? ErrorCode.NoError : (ErrorCode)Enum.Parse(typeof(ErrorCode), controllerName);
+
+            ErrorCode errorCode;
+            if (exception is SqlException)
+            {
+                errorCode = ErrorCode.DatabaseError;
+            }
+            else if (exception is UnauthorizedAccessException)
+            {
+                errorCode = ErrorCode.UnauthorizedError;
+            }
+            else if (exception is KeyNotFoundException)
+            {
+                errorCode = ErrorCode.NotFoundError;
+            }
+            else
+            {
+                errorCode = ErrorCode.InternalServerError;
+            }
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            //context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             var response = new ErrorResponse(errorCode, exception.Message);
             return context.Response.WriteAsJsonAsync(response);
         }

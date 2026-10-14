@@ -2,20 +2,37 @@
 
 using Dapper;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using System.Data;
+using WCNApi.core.Domain.Models;
 
 namespace WCNApi.core.Data
 {
-    public class AppDbContext 
+    public class AppDbContext : DbContext, IDbContext
     {
-        private readonly IConfiguration _configuration;
+        //private readonly IConfiguration _configuration;
         private readonly string _connectionString;
-        public AppDbContext(IConfiguration configuration)
+        public AppDbContext(DbContextOptions<AppDbContext> options, IConfiguration configuration) : base(options)
         {
-            _configuration = configuration;
-            _connectionString = _configuration.GetConnectionString("DefaultConnection");
+            //_configuration = configuration;
+            _connectionString = configuration.GetConnectionString("DefaultConnection") 
+                ?? throw new InvalidOperationException("DefaultConnection is not configured.");
         }
+
+        // EF CORE DATABASE ACCESS
+        public DatabaseFacade Db => Database;
+        public int ExecuteSqlRaw(string sql, params object[] parameters)
+        {
+            return Database.ExecuteSqlRaw(sql, parameters);
+        }
+        public void DisposeContext()
+        {
+            Dispose();
+        }
+
+        // DAPPER / ADO.NET CONNECTION
         public IDbConnection CreateConnection()
             => new SqlConnection(_connectionString);
 
@@ -70,7 +87,22 @@ namespace WCNApi.core.Data
             return table;
         }
 
+        public async Task<int> ExecuteStoreProcedureNonQueryAsync(string storedProcedure, List<SqlParameter>? parameters = null)
+        {
+            using var connection = GetConnection();
 
+            using var command = new SqlCommand(storedProcedure, connection)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+
+            if (parameters != null)
+                command.Parameters.AddRange(parameters.ToArray());
+
+            await connection.OpenAsync();
+
+            return await command.ExecuteNonQueryAsync();
+        }
         public async Task<List<T>> ExecuteQueryAsync<T>(string query, List<SqlParameter>? parameters = null)
         {
             using var connection = GetConnection();
@@ -141,5 +173,29 @@ namespace WCNApi.core.Data
 
         #endregion
 
+        // EF CORE TABLE MAPPING
+        public DbSet<LoginUserDetailsModel> LoginUsers { get; set; } = null!;
+        public DbSet<LoginHistoryModel> LoginHistories { get; set; } = null!;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<LoginUserDetailsModel>(entity =>
+            {
+                entity.ToTable("Tbl_Login_Userdetails");
+                entity.HasKey(x => x.Uid);
+            });
+
+            modelBuilder.Entity<LoginHistoryModel>(entity =>
+            {
+                entity.ToTable("Tbl_Login_History_Copy");
+                entity.HasKey(x => x.Lid);
+                entity.HasOne(x => x.User)
+                    .WithMany(x => x.LoginHistories)
+                    .HasForeignKey(x => x.Userid)
+                    .HasPrincipalKey(x => x.Uid);
+            });
+        }
     }
 }

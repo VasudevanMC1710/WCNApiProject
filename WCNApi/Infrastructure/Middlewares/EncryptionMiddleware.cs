@@ -28,7 +28,7 @@ namespace WCNApi.Infrastructure.Middlewares
                     {
                         memoryStream.Seek(0, SeekOrigin.Begin);
                         var plainText = await new StreamReader(memoryStream).ReadToEndAsync();
-                        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + Guid.NewGuid().ToString();
+                        string timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() + Guid.NewGuid().ToString("N");
                         string key = CryptoHelper.GenerateSecretKey(timestamp);
                         var encryptedData = CryptoHelper.EncryptResponse(plainText, key);
                         var encryptedResponse = new { EncryptedData = encryptedData };

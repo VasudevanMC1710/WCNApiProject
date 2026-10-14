@@ -1,17 +1,17 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WCNApi.core.Domain.Models
 {
     public class LoginUserDetails
     {
         public int Uid { get; set; }
+
+        [Required(ErrorMessage = "Username is required.")]
         public string Username { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; } = string.Empty;
+
         public string Firstname { get; set; } = string.Empty;
         public string Middlename { get; set; } = string.Empty;
         public string Lastname { get; set; } = string.Empty;

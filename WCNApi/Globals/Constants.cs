@@ -5,6 +5,7 @@ namespace WCNApi.Globals
 {
     public static class Constants
     {
+        public const string Development = "DEV";
     }
 
     public static class SeriLog

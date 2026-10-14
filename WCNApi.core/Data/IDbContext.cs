@@ -22,7 +22,7 @@ namespace WCNApi.core.Data
         /// </summary>
         /// <returns></returns>
         int SaveChanges();
-
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         /// <summary>
         /// EXCECUTE the SQL command.
         /// </summary>

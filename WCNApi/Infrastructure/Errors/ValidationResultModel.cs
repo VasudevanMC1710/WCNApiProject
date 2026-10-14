@@ -15,7 +15,7 @@ namespace WCNApi.Infrastructure.Errors
             Message = "Validation Failed";
             ErrorCode = ErrorCode.ValidationModelError;
             Errors = modelState.Keys
-                    .SelectMany(key => modelState[key].Errors.Select(x => new ValidationError(key, x.ErrorMessage)))
+                    .SelectMany(key => modelState[key]!.Errors.Select(x => new ValidationError(key, x.ErrorMessage)))
                     .ToList();
         }
     }

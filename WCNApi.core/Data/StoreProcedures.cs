@@ -11,9 +11,12 @@ namespace WCNApi.core.Data
     {
         #region login 
         
-        public static string sp_CheckLoginCredinitals = "sp_CheckLoginCredinitals";
-        public static string sp_LoginHistory = "sp_LoginHistory";
-        
+        public static string sp_CheckLoginCredinitals_Dig = "sp_CheckLoginCredinitals_Dig";
+        public static string sp_Add_LoginHistory_Dig = "sp_Add_LoginHistory_Dig";
+        public static string sp_Get_LoginHistory_ByUid_Dig = "sp_Get_LoginHistory_ByUid_Dig";
+        public static string sp_Get_UserDashboard_Dig = "sp_Get_UserDashboard_Dig";
+        public static string sp_SearchProspects_Dig = "sp_SearchProspects_Dig";
+
         #endregion
     }
 }

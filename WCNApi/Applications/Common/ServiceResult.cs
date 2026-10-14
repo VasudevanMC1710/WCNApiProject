@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace WCNApi.Applications
+namespace WCNApi.Applications.Common
 {
     public class ServiceResult<T>
     {
