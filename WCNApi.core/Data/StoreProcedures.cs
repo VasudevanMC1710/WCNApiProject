@@ -1,11 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WCNApi.core.Data
+﻿namespace WCNApi.core.Data
 {
     public static class StoreProcedures
     {

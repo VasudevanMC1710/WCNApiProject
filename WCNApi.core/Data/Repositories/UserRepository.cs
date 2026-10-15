@@ -57,8 +57,6 @@ namespace WCNApi.core.Data.Repositories
                     x => x.Uid == userId);
         }
 
-
-
         public async Task<bool> AddOrUpdateUserAsync(AddOrUpdateUserRequestDto request)
         {
             if (request.Uid == 0)

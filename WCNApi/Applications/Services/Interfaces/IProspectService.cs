@@ -6,7 +6,7 @@ namespace WCNApi.Applications.Services.Interfaces
 {
     public interface IProspectService
     {
-        Task<ServiceResult<ProspectDetailsDto>>GetProspectByIdAsync(int pId);
+        Task<ServiceResult<ProspectDetailsDto>> GetProspectByIdAsync(int pId);
         Task<ServiceResult<List<ProspectSearchResponse>>> SearchProspectsAsync(ProspectSearchRequest request);
     }
 }

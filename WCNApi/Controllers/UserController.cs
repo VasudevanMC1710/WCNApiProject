@@ -4,7 +4,6 @@ using WCNApi.Applications.Services.Interfaces;
 using WCNApi.core.Domain.DTOs;
 using WCNApi.core.Domain.Models;
 using WCNApi.Globals;
-using WCNApi.Infrastructure.Helpers;
 
 namespace WCNApi.Controllers
 {

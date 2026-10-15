@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WCNApi.Applications.Services.Interfaces;
-using WCNApi.core.Domain.DTOs;
 using WCNApi.Infrastructure.Helpers;
 
 namespace WCNApi.Controllers
