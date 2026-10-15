@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using AutoMapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WCNApi.core.Domain.DTOs;
 using WCNApi.core.Domain.Models;
@@ -9,9 +10,12 @@ namespace WCNApi.core.Data.Repositories
     public class UserRepository : IUserRepository
     {
         private readonly AppDbContext _context;
-        public UserRepository(AppDbContext context)
+        private readonly IMapper _mapper;
+
+        public UserRepository(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<LoginUserDetails?> LoginUser(string userName, string password)
@@ -33,16 +37,17 @@ namespace WCNApi.core.Data.Repositories
                 new SqlParameter("@Userid", loginHistory.Userid),
                 new SqlParameter("@Username", loginHistory.Username),
                 new SqlParameter("@IpAddress", loginHistory.IpAddress),
-                new SqlParameter("@MachineName", loginHistory.MachineName),
-                new SqlParameter("@Status", loginHistory.Status),
-                new SqlParameter("@Reason", loginHistory.Reason),
+                new SqlParameter("@Network", loginHistory.Network),
+                new SqlParameter("@Connectiontype", loginHistory.Connectiontype),
                 new SqlParameter("@City", loginHistory.City),
-                new SqlParameter("@Region", loginHistory.Region),
-                new SqlParameter("@Pincode", loginHistory.Pincode),
+                new SqlParameter("@UserType", loginHistory.UserType),
+                new SqlParameter("@ISP", loginHistory.ISP),
+                new SqlParameter("@TimeZone", loginHistory.TimeZone),
+                new SqlParameter("@PostalCode", loginHistory.PostalCode),
                 new SqlParameter("@Country", loginHistory.Country),
                 new SqlParameter("@Active", loginHistory.Active)
             };
-            var result = await _context.ExecuteNonQueryAsync<int>(StoreProcedures.sp_Add_LoginHistory_Dig, sqlParameters);
+            var result = await _context.ExecuteStoreProcedureSingleAsync<int>(StoreProcedures.sp_Add_LoginHistory_Dig, sqlParameters);
             return result;
         }
 
@@ -52,23 +57,30 @@ namespace WCNApi.core.Data.Repositories
                     x => x.Uid == userId);
         }
 
-        public async Task<bool> UpdateUserAsync(int userId, string firstName, string lastName, int active)
+
+
+        public async Task<bool> AddOrUpdateUserAsync(AddOrUpdateUserRequestDto request)
         {
-            LoginUserDetails? user = await _context
-                .Set<LoginUserDetails>()
-                .FirstOrDefaultAsync(x => x.Uid == userId);
+            if (request.Uid == 0)
+            {
+                // Add new user
+                var newUser = _mapper.Map<LoginUserDetailsModel>(request);
+                _context.LoginUsers.Add(newUser);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+
+            // Find existing user
+            var user = await _context.LoginUsers.FirstOrDefaultAsync(x => x.Uid == request.Uid);
 
             if (user == null)
             {
                 return false;
             }
 
-            user.Firstname = firstName;
-            user.Lastname = lastName;
-            user.Active = active;
-
+            // Update all mapped columns on the tracked entity
+            _mapper.Map(request, user);
             await _context.SaveChangesAsync();
-
             return true;
         }
 
@@ -92,8 +104,6 @@ namespace WCNApi.core.Data.Repositories
                             Lid = h.Lid,
                             LoginDate = h.LoginDate,
                             IpAddress = h.IpAddress,
-                            MachineName = h.MachineName,
-                            Status = h.Status,
                             City = h.City,
                             Country = h.Country
                         })

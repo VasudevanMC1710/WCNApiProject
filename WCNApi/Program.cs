@@ -1,12 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using System.Globalization;
-using WCNApi.Applications.Services;
-using WCNApi.core.Data;
-using WCNApi.core.Data.Repositories;
-using WCNApi.core.Domain.Repositories;
 using WCNApi.Infrastructure.DependencyInjection;
 using WCNApi.Infrastructure.Helpers;
+using WCNApi.Infrastructure.Mappings;
 using WCNApi.Infrastructure.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +58,11 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<UserMappingProfile>();
+});
 
 //builder.Services.AddDbContext<AppDbContext>(options =>
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

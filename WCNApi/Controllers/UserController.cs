@@ -3,6 +3,7 @@ using WCNApi.Applications.Common;
 using WCNApi.Applications.Services.Interfaces;
 using WCNApi.core.Domain.DTOs;
 using WCNApi.core.Domain.Models;
+using WCNApi.Globals;
 using WCNApi.Infrastructure.Helpers;
 
 namespace WCNApi.Controllers
@@ -23,17 +24,6 @@ namespace WCNApi.Controllers
         [HttpPost("loginuser")]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserDetails loginUserDetails)
         {
-            //try
-            //{
-            //    ServiceResult<LoginUserDetails> result = await _userService.LoginUser(loginUserDetails.Username, loginUserDetails.Password);
-            //    return Ok(result);
-            //}
-            //catch (Exception ex)
-            //{
-            //    //log error
-            //    return StatusCode(500, ex.Message);
-            //}
-
             ServiceResult<LoginUserDetails> result = await _userService.LoginUser(loginUserDetails.Username, loginUserDetails.Password);
             return Ok(result);
         }
@@ -81,10 +71,16 @@ namespace WCNApi.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{userId:int}")]
-        public async Task<IActionResult> UpdateUser(int userId, [FromBody] UpdateUserRequestDto request)
+        [HttpPost]
+        public async Task<IActionResult> AddOrUpdateUser([FromBody] AddOrUpdateUserRequestDto request)
         {
-            var result = await _userService.UpdateUserAsync(userId, request);
+
+            if (!string.IsNullOrWhiteSpace(request.Password))
+            {
+                request.Password = Utils.EncryptPassword(request.Password);
+            }
+
+            var result = await _userService.AddOrUpdateUserAsync(request);
 
             if (!result.Success)
             {

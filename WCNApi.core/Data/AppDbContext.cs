@@ -189,7 +189,7 @@ namespace WCNApi.core.Data
 
             modelBuilder.Entity<LoginHistoryModel>(entity =>
             {
-                entity.ToTable("Tbl_Login_History_Copy");
+                entity.ToTable("Tbl_Login_History");
                 entity.HasKey(x => x.Lid);
                 entity.HasOne(x => x.User)
                     .WithMany(x => x.LoginHistories)

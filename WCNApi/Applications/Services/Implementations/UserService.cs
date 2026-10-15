@@ -99,17 +99,16 @@ namespace WCNApi.Applications.Services.Implementations
             return ServiceResult<LoginUserDetailsModel>.SuccessResult(user);
         }
 
-        public async Task<ServiceResult<bool>> UpdateUserAsync(int userId, UpdateUserRequestDto request)
+        public async Task<ServiceResult<bool>> AddOrUpdateUserAsync(AddOrUpdateUserRequestDto request)
         {
-            if (userId <= 0)
+            if (request.Uid < 0)
             {
                 return ServiceResult<bool>.ErrorResult("Invalid User Id.", HttpStatusCode.BadRequest);
             }
 
-            bool updated = await _userRepository.UpdateUserAsync(userId,
-                request.FirstName, request.LastName, request.Active);
+            bool addOrUpdated = await _userRepository.AddOrUpdateUserAsync(request);
 
-            if (!updated)
+            if (!addOrUpdated)
             {
                 return ServiceResult<bool>.ErrorResult("User not found.", HttpStatusCode.NotFound);
             }

@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WCNApi.core.Domain.Models
+﻿namespace WCNApi.core.Domain.Models
 {
     public class LoginUserDetailsModel
     {
         public int Uid { get; set; }
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-
         public string Firstname { get; set; } = string.Empty;
         public string Middlename { get; set; } = string.Empty;
         public string Lastname { get; set; } = string.Empty;
@@ -33,7 +25,7 @@ namespace WCNApi.core.Domain.Models
         public DateTime? Pwddate { get; set; }
         public int? TextNotify { get; set; }
         public int? EmailNotify { get; set; }
-        public LoginUserDetailsModel? User { get; set; }
+        //public LoginUserDetailsModel? User { get; set; }
         // Navigation property
         public ICollection<LoginHistoryModel> LoginHistories { get; set; }
             = new List<LoginHistoryModel>();

@@ -9,7 +9,7 @@ namespace WCNApi.core.Domain.Repositories
         Task<int> LoginHistory(LoginHistory loginHistory);
 
         Task<LoginUserDetailsModel?> GetUserByIdAsync(int userId);
-        Task<bool> UpdateUserAsync(int userId, string firstName, string lastName, int active);
+        Task<bool> AddOrUpdateUserAsync(AddOrUpdateUserRequestDto request);
         Task<UserWithLoginHistoryDto?> GetUserWithLoginHistoryAsync(int userId);
         Task<UserDashboardDto?> GetUserDashboardAsync();
     }

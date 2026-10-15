@@ -18,5 +18,9 @@ namespace WCNApi.core.Data
         public static string sp_SearchProspects_Dig = "sp_SearchProspects_Dig";
 
         #endregion
+
+        #region ProspectDetails
+        public static string sp_Get_Prospects_Dig = "sp_Get_Prospects_Dig";
+        #endregion
     }
 }
